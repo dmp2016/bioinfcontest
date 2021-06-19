@@ -17,7 +17,7 @@ class TreeV:
     BranchNum: int
 
 
-with open('QProblem3_1/test7') as fl:
+with open('QProblem3_1/test4') as fl:
     # with open('test3') as fl:
     data = fl.read().splitlines()
 
@@ -163,9 +163,9 @@ def get_max_for_q(q: int, D_m_ind: int) -> float:
     res = -math.inf
     lca_cur = 1
     for d in D_m_list[D_m_ind]:
-        if tree[d].Level < tree[lca_cur].Level and tree[q].Level < tree[lca_cur].Level:
+        if tree[d].Level < tree[lca_cur].Level or tree[q].Level < tree[lca_cur].Level:
             break
-        lca_cur = LCA1(q, d)
+        lca_cur = LCA(q, d)
         if ic_list[lca_cur] > res:
             res = ic_list[lca_cur]
     return res
@@ -177,10 +177,10 @@ n_pat = int(data[4 + n_dis])
 print(f'Количество пациентов: {n_pat}')
 res = []
 step = 0
-for cur_pat in range(n_pat):
+for cur_pat in range(70, n_pat):
     if step % 2 == 0:
         print(step)
-    if step % 1000 == 0:
+    if step % 10 == 0:
         with open('output_base1.txt', 'w') as fl:
             for dis_ind in res:
                 fl.write(f'{dis_ind + 1}\n')
