@@ -3,8 +3,6 @@ from dataclasses import dataclass
 from functools import lru_cache
 import sys
 from typing import List
-import numpy as np
-from numpy.core.fromnumeric import shape
 
 
 sys.setrecursionlimit(100000)
@@ -19,7 +17,7 @@ class TreeV:
     BranchNum: int
 
 
-with open('QProblem3_1/test6') as fl:
+with open('QProblem3_1/test7') as fl:
     # with open('test3') as fl:
     data = fl.read().splitlines()
 
@@ -28,7 +26,7 @@ print(f'Количество вершин: {n_tree}')
 parents = [None] + list(map(int, data[1].split()))
 ic_list = dict([(i + 1, d) for i, d in enumerate(map(int, data[2].split()))])
 ic_list[None] = 0
-tree = np.empty(dtype=TreeV, shape=n_tree + 1)
+tree = dict()
 
 for v, (p, ic) in enumerate(zip(parents, ic_list)):
     tree[v + 1] = TreeV(IC=ic, Parent=p, Level=tree[p].Level + 1 if p else 0, Children=[], BranchNum=0)
@@ -49,13 +47,13 @@ while tree_stack:
     for ind in root.Children:
         tree_stack.append(tree[ind])
 
-print(f'Количество веток: {max([tree[item].BranchNum for item in range(1, n_tree + 1)])}')
+print(f'Количество веток: {max([tree[item].BranchNum for item in tree])}')
 
-print(f'Максимальная глубина: {max([tree[v].Level for v in range(1, n_tree + 1)])}')
+print(f'Максимальная глубина: {max([tree[v].Level for v in tree])}')
 
 n_dis = int(data[3])
 print(f'Количество болезней: {n_dis}')
-D_m_list = [list(map(int, data[4 + cur_dis].split()[1:])) for cur_dis in range(n_dis)]
+D_m_list = [sorted(list(map(int, data[4 + cur_dis].split()[1:])), key=lambda x: tree[x].Level, reverse=True) for cur_dis in range(n_dis)]
 
 
 anc_cache = dict()
@@ -162,13 +160,15 @@ def LCA1(q: int, d: int) -> int:
 
 
 def get_max_for_q(q: int, D_m_ind: int) -> float:
-    return np.max([ic_list[LCA1(q, d)] for d in D_m_list[D_m_ind]])
-    # res = -math.inf
-    # for d in D_m_list[D_m_ind]:
-    #     lca_cur = LCA1(q, d)
-    #     if ic_list[lca_cur] > res:
-    #         res = ic_list[lca_cur]
-    # return res
+    res = -math.inf
+    lca_cur = 1
+    for d in D_m_list[D_m_ind]:
+        if tree[d].Level < tree[lca_cur].Level and tree[q].Level < tree[lca_cur].Level:
+            break
+        lca_cur = LCA1(q, d)
+        if ic_list[lca_cur] > res:
+            res = ic_list[lca_cur]
+    return res
 
 
 prepare_anc_cache1()
@@ -187,14 +187,14 @@ for cur_pat in range(n_pat):
             fl.flush()
 
     step += 1
-    Q_p = list(map(int, data[5 + n_dis + cur_pat].split()[1:]))
+    Q_p = sorted(list(map(int, data[5 + n_dis + cur_pat].split()[1:])), key=lambda x: tree[x].Level, reverse=True)
     opt_val = -math.inf
     opt_dis = None
     for D_m_ind in range(len(D_m_list)):
         # cur_val = 0
         # for q in Q_p:
         #     cur_val += get_max_for_q(q, D_m_ind)
-        cur_val = np.sum([get_max_for_q(q, D_m_ind) for q in Q_p])
+        cur_val = sum([get_max_for_q(q, D_m_ind) for q in Q_p])
         if cur_val > opt_val:
             opt_dis = D_m_ind
             opt_val = cur_val
