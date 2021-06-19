@@ -17,7 +17,7 @@ class TreeV:
     BranchNum: int
 
 
-with open('test3') as fl:
+with open('test4') as fl:
     # with open('test3') as fl:
     data = fl.read().splitlines()
 
@@ -182,6 +182,12 @@ step = 0
 for cur_pat in range(n_pat):
     if step % 2 == 0:
         print(step)
+    if step % 10 == 0:
+        with open('output4.txt', 'w') as fl:
+            for dis_ind in res:
+                fl.write(f'{dis_ind + 1}\n')
+            fl.flush()
+
     step += 1
     Q_p = list(map(int, data[5 + n_dis + cur_pat].split()[1:]))
     opt_val = -math.inf
@@ -196,7 +202,7 @@ for cur_pat in range(n_pat):
             opt_val = cur_val
     res.append(opt_dis)
 
-with open('output.txt', 'w') as fl:
+with open('output4.txt', 'w') as fl:
     for dis_ind in res:
         fl.write(f'{dis_ind + 1}\n')
     fl.flush()
