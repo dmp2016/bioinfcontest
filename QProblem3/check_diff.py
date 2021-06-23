@@ -1,5 +1,5 @@
-fl1 = open('QProblem3/output_base.txt')
-fl2 = open('QProblem3/output1.txt')
+fl1 = open('out3.txt')
+fl2 = open('output3.txt')
 
 data1 = fl1.read().splitlines()
 data2 = fl2.read().splitlines()
